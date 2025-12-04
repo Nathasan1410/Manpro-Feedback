@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback Manpro - Pinterest Style</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --bg: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-main: #334155;
+            --text-sec: #64748b;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            overflow-y: scroll; /* Mencegah layout bergeser saat scrollbar muncul */
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-top: 20px;
+        }
+
+        h1 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 2rem;
+        }
+
+        p.subtitle {
+            color: var(--text-sec);
+            font-size: 1.1rem;
+        }
+
+        /* Tabs Navigation */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 30px;
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            background: rgba(240, 242, 245, 0.9);
+            padding: 10px;
+            backdrop-filter: blur(5px);
+            border-radius: 30px;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .tab-btn {
+            background: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-sec);
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .tab-btn:hover {
+            transform: translateY(-2px);
+            color: var(--primary);
+        }
+
+        .tab-btn.active {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+        }
+
+        /* Section Title Dynamic */
+        .section-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--text-main);
+            font-size: 1.5rem;
+            font-weight: 600;
+            opacity: 0;
+            animation: fadeInTitle 0.5s ease-out forwards;
+        }
+
+        @keyframes fadeInTitle {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* MASONRY LAYOUT (PINTEREST STYLE) */
+        .masonry-wrapper {
+            /* Menggunakan kolom CSS untuk efek waterfall/masonry */
+            column-count: 3;
+            column-gap: 20px;
+        }
+
+        /* Responsiveness untuk kolom */
+        @media (max-width: 1024px) {
+            .masonry-wrapper {
+                column-count: 2;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .masonry-wrapper {
+                column-count: 1;
+            }
+        }
+
+        /* Card Styling */
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px; /* Jarak vertikal antar kartu */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            
+            /* PENTING: Mencegah kartu terpotong antar kolom */
+            break-inside: avoid; 
+            -webkit-column-break-inside: avoid;
+            display: inline-block; /* Fix rendering bug di beberapa browser */
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #e2e8f0;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary);
+        }
+
+        .card-content {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            color: #334155;
+            /* Pastikan kata panjang tidak merusak layout */
+            word-wrap: break-word; 
+        }
+
+        /* Quote decoration */
+        .card-content::before {
+            content: "“";
+            font-size: 3rem;
+            color: #e2e8f0;
+            font-family: serif;
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            z-index: 0;
+        }
+        
+        .card-text {
+            position: relative;
+            z-index: 1;
+        }
+
+        .card-footer {
+            border-top: 1px solid #f1f5f9;
+            padding-top: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar-placeholder {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .author-info {
+            flex: 1;
+        }
+
+        .author-name {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--text-main);
+        }
+
+        .author-id {
+            font-size: 0.75rem;
+            color: var(--text-sec);
+            font-family: monospace;
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-top: 2px;
+        }
+
+        /* Animation */
+        @keyframes fadeInUp {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+        
+        .fade-in {
+            animation: fadeInUp 0.5s ease-out forwards;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Feedback Manpro</h1>
+        <p class="subtitle">Robotika Ceria • Pinterest Board View</p>
+    </header>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="renderData('improve')">Improvement</button>
+        <button class="tab-btn" onclick="renderData('experience')">Pengalaman</button>
+        <button class="tab-btn" onclick="renderData('impressions')">Kesan & Pesan</button>
+        <button class="tab-btn" onclick="renderData('course')">Saran Matkul</button>
+    </div>
+
+    <!-- Dynamic Section Title -->
+    <h2 id="sectionTitle" class="section-title"></h2>
+
+    <!-- Container berubah menjadi masonry-wrapper -->
+    <div class="masonry-wrapper" id="cardContainer">
+        <!-- Cards injected here -->
+    </div>
+</div>
+
+<script>
+    // DATA STORE
+const db = {
+    improve: [
+        { text: "Lebih mapan saat survei lokasi", name: "Alven Tendrawan", id: "71230995" },
+        { text: "Good preparation, happiest ending", name: "Putu Gde Kenzie Carlen Mataram", id: "71230994" },
+        { text: "Jika program ini dapat diulang kembali, saya ingin meningkatkan koordinasi dan komunikasi dalam tim, karena selama pelaksanaan kemarin masih terjadi beberapa miskomunikasi", name: "Daniko Sutopo", id: "72230621" },
+        { text: "Mungkin lebih diperbanyak atau mungkin lebih diperjelas dalam konsep sih", name: "Jona", id: "71231068" },
+        { text: "Komunikasi dan pengaturan project yang terstruktur agar tugas yang diberikan tidak dadakan semua", name: "Raphael Felio Bagaskara", id: "71231049" },
+        { text: "Meningkatkan kerja sama dengan Panti Asuhan, agar pihak panti dapat ikut serta dalam rangkaian acara seperti penyambutan dari anak-anak panti/dll", name: "Adhi Prasetyananda Hartono", id: "72230618" },
+        { text: "Yang aku ingin improve, kinerja aku pada divisiku (Humas) dan inisiatif saya saat acara berlangsung. Komunikasi juga perlu ditingkatkan, terutama dengan divisi lain", name: "Efrant Emmanuel Gunawan", id: "71230973" },
+        { text: "Sejauh ini sudah cukup lebih baik tetapi mungkin bakal bisa mempercepat proses desain", name: "Andriano Kurniawan Ladjeba", id: "71230992" },
+        { text: "Yang menurut saya bisa diimprove adalah perencanaan kegiatan yang lebih matang dan survey yang lebih detail agar pelaksanaan kegiatan bisa lebih sesuai dengan yang diinginkan seperti alokasi waktu, target peserta, dan dana", name: "Vincen Imanuel", id: "71220856" },
+        { text: "Komunikasi antar divisi mengenai persiapan acaranya dan bonding antar anggota divisi perlu ditingkatkan", name: "Giovanka", id: "71220924" },
+        { text: "Acaranya dibuat untuk anak-anak di panti asuhan & anak-anak desa disekitar panti asuhan supaya targetnya langsung terpenuhi", name: "Narendra Andaru Prabaswara", id: "72230614" },
+        { text: "Aku ingin improve diriku agar lebih mengerti dengan keadaan panti asuhan, jadi aku harus lebih sabar dalam menangani anak-anak", name: "Galih Pramana Chandra Prasetya", id: "71230976" },
+        { text: "Mungkin bagian susunan/rangkaian lebih dimantapkan lagi", name: "Revaldo Fransisco Hohary", id: "71231042" },
+        { text: "Pembagian job lebih di-reminder, komunikasi lebih terbuka, dan share progress di grup", name: "Karyna Natalia", id: "72230652" },
+        { text: "Lebih komunikatif lagi antar anggota", name: "Rachel Gina Octavia", id: "72230654" },
+        { text: "Komunikasi bisa diimprove lagi agar tidak terjadi miskomunikasi dan lempar-lempar tugas", name: "Andi Putrayana", id: "71220822" },
+        { text: "Saya ingin lebih inisiatif untuk membantu teman dalam divisi", name: "Cynthia Angeline", id: "71220858" },
+        { text: "Kalau aku diberikan kesempatan untuk menjadi leader lagi, saya akan menganalisis culture anggota, memilih gaya leadership yang tepat, dan lebih mengikutsertakan anggota", name: "Nathanael Santoso", id: "71220872" },
+        { text: "Berkoordinasi lebih baik lagi dengan anggota lainnya", name: "Rafael Evan Kristanto", id: "72230610" },
+        { text: "Komunikasi antar divisi ditingkatkan dan lebih komunikatif", name: "Evan Kurnia Wijaya", id: "72230642" }
+    ],
+    experience: [
+        { text: "Banyak dapet pengalaman baru terutama menghadapi orang yang tidak sevisi dengan kita", name: "Alven Tendrawan", id: "71230995" },
+        { text: "JADI MC, kukira bakal garing. seneng anak anak panti bisa enjoy sama jokes bapak bapak yang ku bawain ✌️", name: "Putu Gde Kenzie Carlen Mataram", id: "71230994" },
+        { text: "Pengalaman saya dalam acara Robotika Ceria sangat berkesan. Saya dapat berinteraksi langsung dengan anak-anak di panti asuhan. Dari pengalaman ini saya belajar mengembangkan kemampuan komunikasi, kerja sama dalam tim, serta bagaimana menyampaikan materi secara sederhana dan menyenangkan", name: "Daniko Sutopo", id: "72230621" },
+        { text: "Seru belajar sabar", name: "Jona", id: "71231068" },
+        { text: "Saya merasa lebih percaya diri dalam penyampaian dan juga mendapat ilmu yang bermanfaat untuk kedepannya", name: "Raphael Felio Bagaskara", id: "71231049" },
+        { text: "Melelahkan, tapi interaktif & menyenangkan", name: "Adhi Prasetyananda Hartono", id: "72230618" },
+        { text: "Asik seru, ga nyangka bisa berjalan dengan lancar walaupun ada beberapa kekurangan. Banyak belajar juga karena ini first experience saya", name: "Efrant Emmanuel Gunawan", id: "71230973" },
+        { text: "Cukup seru dan melelahkan karena perlu kejar deadline desain sama mikirin ide desain yang cocok untuk tema anak-anak", name: "Andriano Kurniawan Ladjeba", id: "71230992" },
+        { text: "Sebagai bendahara, saya mendapat banyak pelajaran baru seperti persiapan nota dan kwitansi. Biasanya ada dua bendahara, dan kali ini saya sendiri. Pengalaman baru juga memikirkan dari nol kegiatan apa yang akan dilakukan bersama kelompok yang masih baru", name: "Vincen Imanuel", id: "71220856" },
+        { text: "Pertama kali ikut semacam kepanitiaan, senang dapat bekerja sama dengan tim sampai acaranya selesai. Belajar banyak mengenai koordinasi dan kerja sama antar divisi", name: "Giovanka", id: "71220924" },
+        { text: "Merasa bersyukur karena bisa mengajarkan anak-anak panti asuhan untuk mengenal robotik dan melihat keunikan karakter di setiap anak", name: "Narendra Andaru Prabaswara", id: "72230614" },
+        { text: "Rasanya seru, karna aku sendiri juga belajar banyak dari acara ini, mulai dari hal teknis seperti mikrobit hingga cara bagaimana menghadapi anak-anak dengan berbagai sifat", name: "Galih Pramana Chandra Prasetya", id: "71230976" },
+        { text: "Banyak mengenal orang", name: "Revaldo Fransisco Hohary", id: "71231042" },
+        { text: "Bisa beradaptasi dengan macam-macam sifat anak, manajemen waktu yang seru dan menantang, serta siap mengajar anak-anak dengan tingkah yang beraneka ragam", name: "Karyna Natalia", id: "72230652" },
+        { text: "Menjadi koor divisi tidak semudah bayangan saya, tetapi saya belajar melakukan kewajiban sebaik mungkin dan menerima masukan dari anggota", name: "Rachel Gina Octavia", id: "72230654" },
+        { text: "Sebagai sekretaris saya belajar manajemen waktu, komunikasi untuk meminimalkan miskom. Saat kegiatan, saya juga mengerjakan tugas di luar jobdesk seperti mencari narasumber dan sponsor karena ada opportunity", name: "Andi Putrayana", id: "71220822" },
+        { text: "Bisa belajar hal baru dan bertemu teman baru", name: "Cynthia Angeline", id: "71220858" },
+        { text: "This is my first time to be a leader of 20 people on a proper stage. Experience yang besar dimana aku menemukan banyak room of improvement. Banyak hal yang di kepala makes sense namun di lapangan tidak", name: "Nathanael Santoso", id: "71220872" },
+        { text: "Belajar pengalaman baru dalam menjadi MC meskipun hanya saat ice breaking saja", name: "Rafael Evan Kristanto", id: "72230610" },
+        { text: "Sangat seru, membantu meningkatkan percaya diri, melatih diri untuk berbaur dengan berbagai kalangan usia, dan kerjasama tim", name: "Evan Kurnia Wijaya", id: "72230642" }
+    ],
+    impressions: [
+        { text: "Semoga bisa improve lagi", name: "Alven Tendrawan", id: "71230995" },
+        { text: "Meskipun harus banting stir h-1 bulan dan banyak kejadian susah senang, tapi ketika melihat anak-anak panti tertawa dan curious, itu menyimpan kenangan tersendiri. (thx buat ketua yang selalu backup, GOD BLESS XD) 🫡", name: "Putu Gde Kenzie Carlen Mataram", id: "71230994" },
+        { text: "Kesan saya terhadap acara Robotika Ceria sangat positif dan berkesan. Kegiatan ini memberikan pengalaman baru yang menyenangkan. Semoga pengalaman ini dapat menjadi bahan evaluasi dan referensi di masa depan", name: "Daniko Sutopo", id: "72230621" },
+        { text: "Mantul", name: "Jona", id: "71231068" },
+        { text: "Seru dan lumayan menguras tenaga terutama di panti asuhan kedua karena memang seharusnya selesai di satu panti asuhan saja", name: "Raphael Felio Bagaskara", id: "71231049" },
+        { text: "Anak-anak tidak sesuai ekspektasi panitia, semoga acara ini menjadi pengalaman yang berarti bagi panitia", name: "Adhi Prasetyananda Hartono", id: "72230618" },
+        { text: "Buat yang lain dan diri sendiri, semoga dari acara manpro ini kita bisa lebih improve lagi menjadi pribadi yang lebih baik", name: "Efrant Emmanuel Gunawan", id: "71230973" },
+        { text: "Seru dan melelahkan serta bisa belajar hal baru", name: "Andriano Kurniawan Ladjeba", id: "71230992" },
+        { text: "Kesan: anggota kelompok dapat bekerja sama dengan baik walaupun banyak ketidaksesuaian keinginan, namun pada akhirnya acara berjalan dengan baik karena semua ingin tepat waktu", name: "Vincen Imanuel", id: "71220856" },
+        { text: "Kesan: Overall acara berjalan lancar meski ada miskomunikasi. Pesan: Next event, bonding antar panitia diperkuat dan informasi antar divisi diperjelas", name: "Giovanka", id: "71220924" },
+        { text: "Menyenangkan, seru. Semoga proyek ini bisa berlanjut agar semakin menambah wawasan anak-anak panti asuhan", name: "Narendra Andaru Prabaswara", id: "72230614" },
+        { text: "Semoga acara ini bisa dilanjut lagi tahun depan oleh angkatan selanjutnya", name: "Galih Pramana Chandra Prasetya", id: "71230976" },
+        { text: "Semoga manpro ini dapat dilanjutkan di tahun selanjutnya supaya dapat mengedukasi teman atau saudara kita di panti yang belum pernah berhadapan dengan teknologi", name: "Revaldo Fransisco Hohary", id: "71231042" },
+        { text: "Uwaww, seru tapi sangat menguras tenaga di panti kedua. Pesan: lebih bagus kalau panitia sudah bonding dan prepare matang jadi gak grusa-grusu. Semoga ke depannya lebih baik", name: "Karyna Natalia", id: "72230652" },
+        { text: "Kesan: sudah cukup baik. Pesan: next time sebagai team harus lebih improvisasi dan tidak bergantung pada anggota lain", name: "Rachel Gina Octavia", id: "72230654" },
+        { text: "Kesan: overall experience fun karena banyak yang bisa dipelajari. Pesan: masih banyak yang perlu di-improve terutama komunikasi dan relasi antar panitia perlu di-ice break", name: "Andi Putrayana", id: "71220822" },
+        { text: "Acaranya seru, materi insightful, penyampaian santai, dan games berhasil membuat anak-anak betah", name: "Cynthia Angeline", id: "71220858" },
+        { text: "Being involved as leader dengan partner yang belum dikenal itu menarik. Melihat dua panti berbeda membuat lebih grounded dengan realita. Harapanku acara ini menjadi media belajar untuk menjadi best version of ourselves, bukan pengalaman pahit", name: "Nathanael Santoso", id: "71220872" },
+        { text: "Seru, belajar pengalaman baru mengajari anak-anak panti dengan bahasa yang sesuai. Koordinasi antar anggota perlu diperbaiki untuk menghindari miskomunikasi", name: "Rafael Evan Kristanto", id: "72230610" },
+        { text: "Sangat keren, acara berjalan lancar meski tidak sesuai rencana. Tetap profesional menyelesaikan apa yang sudah dimulai. Pesan: tingkatkan komunikasi antar divisi", name: "Evan Kurnia Wijaya", id: "72230642" }
+    ],
+    course: [
+        { text: "Mungkin lebih ditekankan prokernya sesuai jurusan", name: "Alven Tendrawan", id: "71230995" },
+        { text: "Tema untuk tugas akhir agak terlalu ketat", name: "Putu Gde Kenzie Carlen Mataram", id: "71230994" },
+        { text: "Tidak ada", name: "Daniko Sutopo", id: "72230621" },
+        { text: "Berikan bantuan support, mungkin dana misalnya :)", name: "Jona", id: "71231068" },
+        { text: "Bisa memberi tambahan nilai untuk yang pernah mengikuti kepanitiaan di FTI", name: "Raphael Felio Bagaskara", id: "71231049" },
+        { text: "Tidak ada", name: "Adhi Prasetyananda Hartono", id: "72230618" },
+        { text: "Ke depannya mungkin bisa lebih dispesifikan acara yang harus dibuatnya", name: "Efrant Emmanuel Gunawan", id: "71230973" },
+        { text: "Mungkin kedepannya jenis acaranya bisa diperbanyak", name: "Andriano Kurniawan Ladjeba", id: "71230992" },
+        { text: "Anggota kelompok jangan terlalu banyak dan target peserta jangan ditingkatkan, lebih baik kualitasnya yang ditingkatkan. Kelompok besar membuat waktu membangun chemistry lebih lama", name: "Vincen Imanuel", id: "71220856" },
+        { text: "Bagian materi mungkin bisa dipersingkat atau dipadatkan", name: "Giovanka", id: "71220924" },
+        { text: "Tidak ada, sudah bagus", name: "Narendra Andaru Prabaswara", id: "72230614" },
+        { text: "Mungkin bisa juga diajarkan materi tentang komunikasi kepada klien, terutama kepada anak-anak hingga remaja", name: "Galih Pramana Chandra Prasetya", id: "71230976" },
+        { text: "Pada matkul ini kita membuat event tanpa diberikan dana. Ini melatih berpikir nyata, namun waktu yang cepat membuat beberapa kelompok kesusahan mencari dana sehingga kurang maksimal", name: "Revaldo Fransisco Hohary", id: "71231042" },
+        { text: "Mungkin tema besarnya bisa dikasih supaya tidak bingung + kasih dana awal", name: "Karyna Natalia", id: "72230652" },
+        { text: "Saran untuk matkul, menurut saya sudah baik", name: "Rachel Gina Octavia", id: "72230654" },
+        { text: "Masukan: matkul manpro berjalan sesuai bayangan dan bagus. Saran: tidak ada", name: "Andi Putrayana", id: "71220822" },
+        { text: "Mata kuliah Manpro sangat seru dan interaktif, metode pengajarannya mudah dipahami", name: "Cynthia Angeline", id: "71220858" },
+        { text: "PLS PLS PLS WAKTUNYA DIBANYAKIN LAGI DAN KELOMPOK DIBENTUK LEBIH AWAL. Sesi 0 khusus pembentukan kelompok & diskusi akan sangat membantu. Lebih baik kehilangan anggota karena MBKM daripada kehilangan waktu untuk mengumpulkan kelompok", name: "Nathanael Santoso", id: "71220872" },
+        { text: "Mungkin bisa diberikan anggaran awal untuk tiap kelompok agar beban mencari dana tidak terlalu sulit", name: "Rafael Evan Kristanto", id: "72230610" },
+        { text: "Jika memungkinkan bisa diberikan dana tambahan untuk berjalannya acara", name: "Evan Kurnia Wijaya", id: "72230642" }
+    ]
+};
+    // MAPPING TITLE
+    const sectionTitles = {
+        improve: "Kalo bisa diulang lagi, apa yang mau kamu/kita bisa improve?",
+        experience: "Pengalaman Pribadi dalam Acara Robotika Ceria",
+        impressions: "Kesan & Pesan ke Acara Robotika Ceria",
+        course: "Masukkan & Saran utk Matkul Manpro"
+    };
+
+    const cardContainer = document.getElementById('cardContainer');
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const titleElement = document.getElementById('sectionTitle');
+
+    function getInitials(name) {
+        return name
+            .split(' ')
+            .map(word => word[0])
+            .slice(0, 2)
+            .join('')
+            .toUpperCase();
+    }
+
+    function renderData(key) {
+        // Update Title
+        titleElement.innerText = sectionTitles[key];
+        // Reset animation trigger
+        titleElement.style.animation = 'none';
+        titleElement.offsetHeight; /* trigger reflow */
+        titleElement.style.animation = 'fadeInTitle 0.5s ease-out forwards';
+
+        // Clear existing content
+        cardContainer.innerHTML = '';
+        
+        // Update active button state
+        tabBtns.forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.getAttribute('onclick').includes(key)) {
+                btn.classList.add('active');
+            }
+        });
+
+        // Generate cards
+        const items = db[key];
+        items.forEach((item, index) => {
+            const card = document.createElement('div');
+            card.className = 'card fade-in';
+            // Variasi delay animasi
+            card.style.animationDelay = `${index * 0.03}s`;
+            
+            card.innerHTML = `
+                <div class="card-content">
+                    <span class="card-text">${item.text}</span>
+                </div>
+                <div class="card-footer">
+                    <div class="avatar-placeholder">${getInitials(item.name)}</div>
+                    <div class="author-info">
+                        <div class="author-name">${item.name}</div>
+                        <div class="author-id">${item.id}</div>
+                    </div>
+                </div>
+            `;
+            cardContainer.appendChild(card);
+        });
+    }
+
+    // Initial render
+    renderData('improve');
+
+</script>
+
+</body>
+</html>
